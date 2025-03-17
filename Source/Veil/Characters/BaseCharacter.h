@@ -34,7 +34,16 @@ public:
 		
 	virtual void OnDeath(AActor* DeathCauser);
 
+	virtual void Falling() override;
+	virtual void NotifyJumpApex() override;
+	virtual void Landed(const FHitResult& Hit) override;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UCurveFloat* FallDamageCurve;
+
 protected:
+
+	FVector FallingApex;
 
 	// Custom Movement Component
 	class UBaseCharacterMovementComponent* BaseCharacterMovementComponent;

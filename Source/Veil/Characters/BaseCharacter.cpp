@@ -6,6 +6,8 @@
 
 #include "Components/StatsComponent.h"
 
+#include "Engine/DamageEvents.h"
+
 // Sets default values
 ABaseCharacter::ABaseCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer.SetDefaultSubobjectClass<UBaseCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
@@ -61,3 +63,26 @@ void ABaseCharacter::OnDeath(AActor* DeathCauser)
 	GetMesh()->SetCollisionProfileName("Ragdoll");
 }
 
+void ABaseCharacter::Falling()
+{
+	Super::Falling();
+	FallingApex = GetActorLocation();
+}
+
+void ABaseCharacter::NotifyJumpApex()
+{
+	Super::NotifyJumpApex();
+	FallingApex = GetActorLocation();
+}
+
+void ABaseCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+
+	if (IsValid(FallDamageCurve))
+	{
+		float FallDamage = FallDamageCurve->GetFloatValue(FallingApex.Z - GetActorLocation().Z);
+		GEngine->AddOnScreenDebugMessage(0, 2.0f, FColor::Emerald, FString::Printf(TEXT("FallDamage %f"), FallDamage));
+		TakeDamage(FallDamage, FDamageEvent(), GetController(), Hit.GetActor());
+	}
+}
