@@ -5,7 +5,7 @@
 
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-
+#include "Characters/Components/BaseCharacterMovementComponent.h"
 #include "Components/PlayerComponents/MinimapCaptureComponent.h"
 
 ABasePlayerCharacter::ABasePlayerCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -20,7 +20,9 @@ ABasePlayerCharacter::ABasePlayerCharacter(const FObjectInitializer& ObjectIniti
 	FollowCamera->bUsePawnControlRotation = false;
 	FollowCamera->SetRelativeLocation(FVector(0.f, 0.f, 100.f));
 
+	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
 
 	MinimapCameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("Minimap Camera Boom"));
 	MinimapCameraBoom->SetupAttachment(RootComponent);
@@ -46,6 +48,18 @@ void ABasePlayerCharacter::Look(const FVector2D& Value)
 	}
 }
 
+void ABasePlayerCharacter::Move(const FVector2D& Value)
+{
+	if (Controller)
+	{
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotationMatrix YawRotationMatrix(FRotator(0, Rotation.Yaw, 0));
+
+		AddMovementInput(YawRotationMatrix.GetUnitAxis(EAxis::X), Value.Y);
+		AddMovementInput(YawRotationMatrix.GetUnitAxis(EAxis::Y), Value.X);
+	}
+}
+
 FGenericTeamId ABasePlayerCharacter::GetGenericTeamId() const
 {
 	return (uint8)Faction;
@@ -54,4 +68,15 @@ FGenericTeamId ABasePlayerCharacter::GetGenericTeamId() const
 UMinimapCaptureComponent* ABasePlayerCharacter::GetMinimapCapture()
 {
 	return MinimapCapture;
+}
+
+void ABasePlayerCharacter::EquipCurrentWeapon()
+{
+	Super::EquipCurrentWeapon();
+
+	CameraBoom->bUsePawnControlRotation = true;
+	BaseCharacterMovementComponent->bOrientRotationToMovement = false;
+	bUseControllerRotationYaw = true;
+
+	CameraBoom->TargetOffset = FVector(0, 150, 0);
 }

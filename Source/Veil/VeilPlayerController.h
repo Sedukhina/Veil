@@ -35,13 +35,21 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	class UInputAction* JumpAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	class UInputAction* AttackAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	class UInputAction* LookAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	class UInputAction* EquipCurrentWeaponAction;
 
 	// Character functions
 	void Move(const FInputActionValue& Value);
 	void Jump();
 
 	void Look(const FInputActionValue& Value);
+
+	void EquipCurrentWeapon();
+	void Attack();
 };

@@ -2,9 +2,10 @@
 
 #include "BaseCharacter.h"
 
-#include "Components/BaseCharacterMovementComponent.h"
+#include "Characters/Components/BaseCharacterMovementComponent.h"
 
-#include "Components/StatsComponent.h"
+#include "Characters/Components/StatsComponent.h"
+#include "Characters/Components/CharacterEquipmentComponent.h"
 
 #include "Engine/DamageEvents.h"
 
@@ -18,6 +19,8 @@ ABaseCharacter::ABaseCharacter(const FObjectInitializer& ObjectInitializer) : Su
 
 	StatsComponent = CreateDefaultSubobject<UStatsComponent>(TEXT("Stats"));
 	StatsComponent->OnDeath.AddUObject(this, &ABaseCharacter::OnDeath);
+
+	CharacterEquipmentComponent = CreateDefaultSubobject<UCharacterEquipmentComponent>(TEXT("Character Equipment"));
 }
 
 // Called when the game starts or when spawned
@@ -31,18 +34,6 @@ void ABaseCharacter::BeginPlay()
 void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-}
-
-void ABaseCharacter::Move(const FVector2D& Value)
-{
-	if (Controller)
-	{
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotationMatrix YawRotationMatrix(FRotator(0, Rotation.Yaw, 0));
-
-		AddMovementInput(YawRotationMatrix.GetUnitAxis(EAxis::X), Value.Y);
-		AddMovementInput(YawRotationMatrix.GetUnitAxis(EAxis::Y), Value.X);
-	}
 }
 
 UBaseCharacterMovementComponent* ABaseCharacter::GetBaseCharacterMovementComponent()
@@ -85,4 +76,19 @@ void ABaseCharacter::Landed(const FHitResult& Hit)
 		GEngine->AddOnScreenDebugMessage(0, 2.0f, FColor::Emerald, FString::Printf(TEXT("FallDamage %f"), FallDamage));
 		TakeDamage(FallDamage, FDamageEvent(), GetController(), Hit.GetActor());
 	}
+}
+
+void ABaseCharacter::EquipCurrentWeapon()
+{
+	CharacterEquipmentComponent->CreateCurrentWeapon();
+}
+
+void ABaseCharacter::Attack()
+{
+	CharacterEquipmentComponent->Attack();
+}
+
+EEquipableItemType ABaseCharacter::GetCurrentEquippedItemType()
+{
+	return CharacterEquipmentComponent->GetCurrentEquippedItemType();
 }

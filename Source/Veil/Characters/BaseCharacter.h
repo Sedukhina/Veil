@@ -9,6 +9,7 @@
 
 #include "BaseCharacter.generated.h"
 
+
 UCLASS(NotBlueprintable)
 class VEIL_API ABaseCharacter : public ACharacter
 {
@@ -26,9 +27,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Base character movement
-	void Move(const FVector2D& Value);
-
 	class UBaseCharacterMovementComponent* GetBaseCharacterMovementComponent();
 	class UStatsComponent* GetStatsComponent();
 		
@@ -37,9 +35,14 @@ public:
 	virtual void Falling() override;
 	virtual void NotifyJumpApex() override;
 	virtual void Landed(const FHitResult& Hit) override;
+
+	virtual void EquipCurrentWeapon();
+	void Attack();
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UCurveFloat* FallDamageCurve;
+
+	EEquipableItemType GetCurrentEquippedItemType();
 
 protected:
 
@@ -47,6 +50,9 @@ protected:
 
 	// Custom Movement Component
 	class UBaseCharacterMovementComponent* BaseCharacterMovementComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UCharacterEquipmentComponent* CharacterEquipmentComponent;
 
 	// Stats Component
 	class UStatsComponent* StatsComponent;

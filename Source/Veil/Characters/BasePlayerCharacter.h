@@ -37,7 +37,12 @@ public:
 	// Camera movement
 	void Look(const FVector2D& Value);
 
+	// Base character movement
+	void Move(const FVector2D& Value);
+
 	virtual FGenericTeamId GetGenericTeamId() const override;
 
 	class UMinimapCaptureComponent* GetMinimapCapture();
+
+	virtual void EquipCurrentWeapon() override;
 };

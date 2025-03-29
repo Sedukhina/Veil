@@ -18,8 +18,12 @@ void UBaseCharacterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 
 	if (CachedOwner.IsValid())
 	{
+		CurrentEquippedItemType = CachedOwner->GetCurrentEquippedItemType();
+		AimRotation = CachedOwner->GetBaseAimRotation();
+
 		UBaseCharacterMovementComponent* OwnerCharacterMovementComponent = CachedOwner->GetBaseCharacterMovementComponent();
 		Speed = OwnerCharacterMovementComponent->Velocity.Size();
+		Direction = CalculateDirection(OwnerCharacterMovementComponent->Velocity, CachedOwner->GetActorRotation());
 		bIsFalling = OwnerCharacterMovementComponent->IsFalling();
 	}
 }
